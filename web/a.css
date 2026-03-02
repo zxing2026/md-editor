@@ -1,0 +1,52 @@
+.sticky-box {
+    /* 关键属性 1: 设置为粘性定位 */
+    position: -webkit-sticky;
+    /* 兼容 Safari */
+    position: sticky;
+
+    /* 关键属性 2: 定义吸附位置 (距离顶部 0px) */
+    top: 0;
+
+    /* 装饰样式 */
+    padding: 12px;
+
+    /* 建议：添加层级，防止被其他内容遮挡 */
+    z-index: 1000;
+}
+
+.simple-btn {
+    /* 基础样式 */
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #007bff;
+    /* 主色调：蓝色 */
+    border: none;
+    border-radius: 8px;
+    /* 圆角 */
+    cursor: pointer;
+
+    /* 过渡效果，让变化更平滑 */
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+/* 鼠标悬停状态 */
+.simple-btn:hover {
+    background-color: #0056b3;
+    /* 深一点的蓝色 */
+}
+
+/* 鼠标按下状态 */
+.simple-btn:active {
+    transform: scale(0.98);
+    /* 轻微缩小，增加点击感 */
+    background-color: #004494;
+}
+
+/* 可选：禁用状态 */
+.simple-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}

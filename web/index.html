@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- UI -->
+    <div class="sticky-box">
+        <button class="simple-btn" id="refresh">刷新</button>
+        <button class="simple-btn" id="save">保存</button>
+    </div>
+    <div id="vditor"></div>
+    <!-- 库 -->
+    <link rel="stylesheet" href="/index.min.css" />
+    <script src="/index.min.js"></script>
+    <script src="/axios.min.js"></script>
+    <link rel="stylesheet" href="/a.css" />
+    <!-- 代码 -->
+    <script>
+        let vditor;
+        window.onload = function () {
+            vditor = new Vditor('vditor', {
+                "minHeight": 500,
+                mode: 'sv',
+                cache: {
+                    enable: false,
+                }, "toolbar": [], "preview": {
+                    "actions": []
+                }, after() {
+                    refresh()
+                },
+            });
+
+        };
+        document.getElementById("refresh").onclick = refresh
+        document.getElementById("save").onclick = save
+        function refresh() {
+            axios.get('/refresh', {
+                responseType: 'text',
+            }).then(res => {
+                vditor.setValue(res.data)
+            })
+        }
+        function save() {
+            axios.post('/save', vditor.getValue(), {
+                headers: {
+                    'Content-Type': 'text/plain',
+                }
+            }).then(res => {
+                console.log(res.data);
+            })
+        }
+    </script>
+</body>
+
+</html>
