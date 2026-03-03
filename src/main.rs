@@ -7,13 +7,15 @@ use tokio::io::{AsyncReadExt, AsyncSeekExt, AsyncWriteExt};
 use tokio::sync::Mutex;
 use zxing_app::run_app;
 
+//状态
 #[derive(Clone)]
 struct AppState {
     file_handle: Arc<Mutex<Option<File>>>,
 }
+//入口
 #[tokio::main]
 async fn main() {
-    //初始化状态数据
+    //初始化状态
     let args: Vec<String> = std::env::args().collect();
     let initial_file = if args.len() > 1 {
         let path = &args[1];
@@ -43,7 +45,7 @@ async fn main() {
         .route("/save", post(save_handler))
         .with_state(state);
     //启动
-    run_app("/home/zx/下载/demo1/web", router).await;
+    run_app("web", router).await;
 }
 
 async fn refresh_handler(State(state): State<AppState>) -> impl IntoResponse {
@@ -88,5 +90,6 @@ async fn save_handler(State(state): State<AppState>, body: String) -> impl IntoR
     (StatusCode::OK, "Ok".to_string())
 }
 fn error(txt: &str) -> (StatusCode, String) {
+    eprintln!("{}", txt);
     (StatusCode::INTERNAL_SERVER_ERROR, format!("{}", txt))
 }
