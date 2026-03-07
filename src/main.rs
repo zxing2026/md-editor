@@ -1,3 +1,6 @@
+use axum::http::header;
+use axum::response::Html;
+use axum::response::Response;
 use axum::{
     Router, extract::State, http::StatusCode, response::IntoResponse, routing::get, routing::post,
 };
@@ -5,8 +8,7 @@ use std::sync::Arc;
 use tokio::fs::File;
 use tokio::io::{AsyncReadExt, AsyncSeekExt, AsyncWriteExt};
 use tokio::sync::Mutex;
-use zxing_app::run_app;
-
+use zxing_app::run_app_2;
 //状态
 #[derive(Clone)]
 struct AppState {
@@ -43,9 +45,17 @@ async fn main() {
     let router = Router::new()
         .route("/refresh", get(refresh_handler))
         .route("/save", post(save_handler))
+        .route(
+            "/",
+            get(|| async { Html(include_str!("../web/index.html")) }),
+        )
+        .route("/a.css", get(a_css))
+        .route("/axios.min.js", get(axios_min_js))
+        .route("/index.min.js", get(index_min_js))
+        .route("/index.min.css", get(index_min_css))
         .with_state(state);
     //启动
-    run_app("web", router).await;
+    run_app_2(router).await;
 }
 
 async fn refresh_handler(State(state): State<AppState>) -> impl IntoResponse {
@@ -92,4 +102,21 @@ async fn save_handler(State(state): State<AppState>, body: String) -> impl IntoR
 fn error(txt: &str) -> (StatusCode, String) {
     eprintln!("{}", txt);
     (StatusCode::INTERNAL_SERVER_ERROR, format!("{}", txt))
+}
+async fn axios_min_js() -> Response {
+    let body = include_str!("../web/axios.min.js");
+    ([(header::CONTENT_TYPE, "application/javascript")], body).into_response()
+}
+async fn index_min_js() -> Response {
+    let body = include_str!("../web/index.min.js");
+    ([(header::CONTENT_TYPE, "application/javascript")], body).into_response()
+}
+async fn index_min_css() -> Response {
+    let body = include_str!("../web/index.min.css");
+    ([(header::CONTENT_TYPE, "text/css")], body).into_response()
+}
+
+async fn a_css() -> Response {
+    let body = include_str!("../web/a.css");
+    ([(header::CONTENT_TYPE, "text/css")], body).into_response()
 }
