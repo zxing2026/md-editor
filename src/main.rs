@@ -8,7 +8,7 @@ use std::sync::Arc;
 use tokio::fs::File;
 use tokio::io::{AsyncReadExt, AsyncSeekExt, AsyncWriteExt};
 use tokio::sync::Mutex;
-use zxing_app::run_app_2;
+use zxing_app::run_app;
 //状态
 #[derive(Clone)]
 struct AppState {
@@ -29,8 +29,8 @@ async fn main() {
             .await
         {
             Ok(f) => Some(f),
-            Err(_e) => {
-                eprintln!("文件打开失败");
+            Err(e) => {
+                eprintln!("文件打开失败:{}", e);
                 None
             }
         }
@@ -55,7 +55,7 @@ async fn main() {
         .route("/index.min.css", get(index_min_css))
         .with_state(state);
     //启动
-    run_app_2(router).await;
+    run_app(router).await;
 }
 
 async fn refresh_handler(State(state): State<AppState>) -> impl IntoResponse {
@@ -103,6 +103,7 @@ fn error(txt: &str) -> (StatusCode, String) {
     eprintln!("{}", txt);
     (StatusCode::INTERNAL_SERVER_ERROR, format!("{}", txt))
 }
+//几个文件的内部嵌入
 async fn axios_min_js() -> Response {
     let body = include_str!("../web/axios.min.js");
     ([(header::CONTENT_TYPE, "application/javascript")], body).into_response()
